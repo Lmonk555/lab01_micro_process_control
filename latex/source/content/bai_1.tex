@@ -15,12 +15,31 @@ In this exercise, the status of two LEDs are switched every 2 seconds, as demons
 
 \textbf{Report 1: }Depict the schematic from Proteus simulation in this report. The caption of the figure is a downloadable link to the Proteus project file (e.g. a github link).\\
 
+\begin{figure}[!htp]
+    \centering
+    \includegraphics[width=5in]{source/picture/schematic_ex01.jpg}
+    \caption{\href{https://github.com/Lmonk555/lab01_micro_process_control/blob/8d04aa0534fb3de1aa49ddf4db8511397b236556/Proteus8/lab_01.hex}{\textit{Proteus schematic for 2 LEDs}}}
+    \label{schematic_ex01}
+\end{figure}
+
 \textbf{Report 2: } Present the source code in the infinite loop while of your project. If a user-defined functions is used, it is required to present in this part. A brief description can be added for this function (e.g. using comments). A template to present your source code is presented bellow.
 
-\begin{lstlisting}[caption=An example for your source code]
-while (1){
-	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-	HAL_Delay(1000);
+\begin{lstlisting}[caption=Exercise 01 source code in while loop]
+while (1)
+{
+// Using HAL_GPIO_WritePin() for hard-write LEDs' state due to unknown initial states.
+// Therefore, not using HAL_GPIO_TogglePin() as in example
+
+HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_SET);
+HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_RESET);
+HAL_Delay(2000);
+
+HAL_GPIO_WritePin(LED_RED_GPIO_Port, LED_RED_Pin, GPIO_PIN_RESET);
+HAL_GPIO_WritePin(LED_YELLOW_GPIO_Port, LED_YELLOW_Pin, GPIO_PIN_SET);
+HAL_Delay(2000);
+/* USER CODE END WHILE */
+
+/* USER CODE BEGIN 3 */
 }
 \end{lstlisting}
 
