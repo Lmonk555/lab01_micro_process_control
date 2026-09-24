@@ -101,6 +101,8 @@ Extend to the 4-way traffic light. Arrange 12 LEDs in a nice shape to simulate t
     \label{schematic_ex03}
 \end{figure}
 
+- Due to the increasing of number of LEDs, we will use arrays to handle them, or struct if you prefer.
+
 \begin{lstlisting}[language=c,caption={Exercise 03 source code},label={lst:ex03}]
     MX_GPIO_Init();
     /* USER CODE BEGIN 2 */
@@ -110,11 +112,10 @@ Extend to the 4-way traffic light. Arrange 12 LEDs in a nice shape to simulate t
         uint16_t ledPins[]       = { RED_1_Pin, YELLOW_1_Pin, GREEN_1_Pin,
                                     RED_2_Pin, YELLOW_2_Pin, GREEN_2_Pin };
 
-        //                      	 R1     Y1     G1     R2     Y2     G2
-        GPIO_PinState phase1[] = { SET,   SET,   RESET, RESET, SET,   SET   }; // Dir1 green, Dir2 red
-        GPIO_PinState phase2[] = { SET,   RESET, SET,   RESET, SET,   SET   }; // Dir1 yellow, Dir2 red
-        GPIO_PinState phase3[] = { RESET, SET,   SET,   SET,   SET,   RESET }; // Dir1 red, Dir2 green
-        GPIO_PinState phase4[] = { RESET, SET,   SET,   SET,   RESET, SET   }; // Dir1 red, Dir2 yellow
+        GPIO_PinState phase1[] = { SET,   SET,   RESET, RESET, SET,   SET   };
+        GPIO_PinState phase2[] = { SET,   RESET, SET,   RESET, SET,   SET   };
+        GPIO_PinState phase3[] = { RESET, SET,   SET,   SET,   SET,   RESET };
+        GPIO_PinState phase4[] = { RESET, SET,   SET,   SET,   RESET, SET   };
 
         uint32_t delays[] = { 3000, 2000, 3000, 2000 };
         GPIO_PinState* phases[] = { phase1, phase2, phase3, phase4 };
@@ -260,7 +261,6 @@ MX_GPIO_Init();
     uint16_t ledPins[]       = { RED_1_Pin, YELLOW_1_Pin, GREEN_1_Pin,
                                 RED_2_Pin, YELLOW_2_Pin, GREEN_2_Pin };
 
-    //                      	 R1     Y1     G1     R2     Y2     G2
     GPIO_PinState phase1[] = { SET,   SET,   RESET, RESET, SET,   SET   }; // GREEN_1, RED_2
     GPIO_PinState phase2[] = { SET,   RESET, SET,   RESET, SET,   SET   }; // YELLOW_1, RED_2
     GPIO_PinState phase3[] = { RESET, SET,   SET,   SET,   SET,   RESET }; // RED_1, GREEN_2
@@ -271,10 +271,6 @@ MX_GPIO_Init();
         for (int i = 0; i < 6; i++)
             HAL_GPIO_WritePin(ledPorts[i], ledPins[i], pattern[i]);
     }
-
-    //##########################################################################################################
-    //##########################################################################################################
-    //##########################################################################################################
 
     typedef struct
     {
@@ -569,39 +565,39 @@ clearAllClock();
 /* USER CODE BEGIN WHILE */
 while (1)
 {
-int hourPin = hour % 12;        // 0-11 directly
-int minPin  = minute / 5;       // 0-59 -> 0-11 (each LED = 5 min)
-int secPin  = second / 5;       // 0-59 -> 0-11 (each LED = 5 sec)
+    int hourPin = hour % 12;        // 0-11 directly
+    int minPin  = minute / 5;       // 0-59 -> 0-11 (each LED = 5 min)
+    int secPin  = second / 5;       // 0-59 -> 0-11 (each LED = 5 sec)
 
-// Turn off previous clock pin (if different between [now] & [prev])
-if (second == 0 || prevHourPin != hourPin) clearNumberOnClock(prevHourPin);
-if (second == 0 || prevMinPin  != minPin)  clearNumberOnClock(prevMinPin);
-clearNumberOnClock(prevSecPin);
+    // Turn off previous clock pin (if different between [now] & [prev])
+    if (second == 0 || prevHourPin != hourPin) clearNumberOnClock(prevHourPin);
+    if (second == 0 || prevMinPin  != minPin)  clearNumberOnClock(prevMinPin);
+    clearNumberOnClock(prevSecPin);
 
-// Change clock pin to current time
-setNumberOnClock(hourPin);
-setNumberOnClock(minPin);
-setNumberOnClock(secPin);
+    // Change clock pin to current time
+    setNumberOnClock(hourPin);
+    setNumberOnClock(minPin);
+    setNumberOnClock(secPin);
 
-prevHourPin = hourPin;
-prevMinPin  = minPin;
-prevSecPin  = secPin;
+    prevHourPin = hourPin;
+    prevMinPin  = minPin;
+    prevSecPin  = secPin;
 
-HAL_Delay(1000);
+    HAL_Delay(1000);
 
-// Second increment
-second++;
-if (second >= 60)
-{
-    second = 0;
-    minute++;
-    if (minute >= 60)
+    // Second increment
+    second++;
+    if (second >= 60)
     {
-        minute = 0;
-        hour++;
-        if (hour >= 12) hour = 0;
+        second = 0;
+        minute++;
+        if (minute >= 60)
+        {
+            minute = 0;
+            hour++;
+            if (hour >= 12) hour = 0;
+        }
     }
-}
 }
 \end{lstlisting}
 
