@@ -1,0 +1,115 @@
+MX_GPIO_Init();
+/* USER CODE BEGIN 2 */
+
+    GPIO_TypeDef* ledPorts[] = { RED_1_GPIO_Port, YELLOW_1_GPIO_Port, GREEN_1_GPIO_Port,
+                                RED_2_GPIO_Port, YELLOW_2_GPIO_Port, GREEN_2_GPIO_Port };
+    uint16_t ledPins[]       = { RED_1_Pin, YELLOW_1_Pin, GREEN_1_Pin,
+                                RED_2_Pin, YELLOW_2_Pin, GREEN_2_Pin };
+
+    //                      	 R1     Y1     G1     R2     Y2     G2
+    GPIO_PinState phase1[] = { SET,   SET,   RESET, RESET, SET,   SET   }; // GREEN_1, RED_2
+    GPIO_PinState phase2[] = { SET,   RESET, SET,   RESET, SET,   SET   }; // YELLOW_1, RED_2
+    GPIO_PinState phase3[] = { RESET, SET,   SET,   SET,   SET,   RESET }; // RED_1, GREEN_2
+    GPIO_PinState phase4[] = { RESET, SET,   SET,   SET,   RESET, SET   }; // RED_1, YELLOW_2
+
+    void setLeds(GPIO_PinState *pattern)
+    {
+        for (int i = 0; i < 6; i++)
+            HAL_GPIO_WritePin(ledPorts[i], ledPins[i], pattern[i]);
+    }
+
+    //##########################################################################################################
+    //##########################################################################################################
+    //##########################################################################################################
+
+    typedef struct
+    {
+        GPIO_TypeDef *port;
+        uint16_t pin;
+    } SegPin;
+
+    SegPin segments_1[] =
+    {
+        { A1_GPIO_Port, A1_Pin },
+        { B1_GPIO_Port, B1_Pin },
+        { C1_GPIO_Port, C1_Pin },
+        { D1_GPIO_Port, D1_Pin },
+        { E1_GPIO_Port, E1_Pin },
+        { F1_GPIO_Port, F1_Pin },
+        { G1_GPIO_Port, G1_Pin },
+    };
+
+    SegPin segments_2[] =
+    {
+        { A2_GPIO_Port, A2_Pin },
+        { B2_GPIO_Port, B2_Pin },
+        { C2_GPIO_Port, C2_Pin },
+        { D2_GPIO_Port, D2_Pin },
+        { E2_GPIO_Port, E2_Pin },
+        { F2_GPIO_Port, F2_Pin },
+        { G2_GPIO_Port, G2_Pin },
+    };
+
+    GPIO_PinState digitPatterns[10][7] =
+    {
+        { RESET, RESET, RESET, RESET, RESET, RESET, SET   },	// 0
+        { SET,   RESET, RESET, SET,   SET,   SET,   SET   },	// 1
+        { RESET, RESET, SET,   RESET, RESET, SET,   RESET },	// 2
+        { RESET, RESET, RESET, RESET, SET,   SET,   RESET },	// 3
+        { SET,   RESET, RESET, SET,   SET,   RESET, RESET },	// 4
+        { RESET, SET,   RESET, RESET, SET,   RESET, RESET },	// 5
+        { RESET, SET,   RESET, RESET, RESET, RESET, RESET },	// 6
+        { RESET, RESET, RESET, SET,   SET,   SET,   SET   },	// 7
+        { RESET, RESET, RESET, RESET, RESET, RESET, RESET },	// 8
+        { RESET, RESET, RESET, RESET, SET,   RESET, RESET },	// 9
+    };
+
+    void display7SEG(SegPin *segs, int num)
+    {
+        if (num < 0 || num > 9) return;
+        for (int i = 0; i < 7; i++)
+            HAL_GPIO_WritePin(segs[i].port, segs[i].pin, digitPatterns[num][i]);
+    }
+
+    int counter_red = 0;
+
+/* USER CODE END 2 */
+
+/* Infinite loop */
+/* USER CODE BEGIN WHILE */
+    while (1)
+    {
+        counter_red = 5;
+        setLeds(phase1);						// GREEN 1, RED 2
+        for (int i = 3; i >= 1; i--)
+        {
+            display7SEG(segments_1, i);
+            display7SEG(segments_2, counter_red--);
+            HAL_Delay(1000);
+        }
+
+        setLeds(phase2);						// YELLOW 1, RED 2
+        for (int i = 2; i >= 1; i--)
+        {
+            display7SEG(segments_1, i);
+            display7SEG(segments_2, counter_red--);
+            HAL_Delay(1000);
+        }
+
+        counter_red = 5;
+        setLeds(phase3);						// RED 1, GREEN 2
+        for (int i = 3; i >= 1; i--)
+        {
+            display7SEG(segments_2, i);
+            display7SEG(segments_1, counter_red--);
+            HAL_Delay(1000);
+        }
+
+        setLeds(phase4);						// RED 1, GREEN 2
+        for (int i = 2; i >= 1; i--)
+        {
+            display7SEG(segments_2, i);
+            display7SEG(segments_1, counter_red--);
+            HAL_Delay(1000);
+        }
+    }

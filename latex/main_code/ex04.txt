@@ -1,0 +1,55 @@
+MX_GPIO_Init();
+/* USER CODE BEGIN 2 */
+
+typedef struct
+{
+    GPIO_TypeDef *port;
+    uint16_t pin;
+} SegPin;
+
+SegPin segments[] =
+{
+    { A_GPIO_Port, A_Pin },
+    { B_GPIO_Port, B_Pin },
+    { C_GPIO_Port, C_Pin },
+    { D_GPIO_Port, D_Pin },
+    { E_GPIO_Port, E_Pin },
+    { F_GPIO_Port, F_Pin },
+    { G_GPIO_Port, G_Pin },
+};
+
+GPIO_PinState digitPatterns[10][7] =
+{
+    { RESET, RESET, RESET, RESET, RESET, RESET, SET   },	// 0
+    { SET,   RESET, RESET, SET,   SET,   SET,   SET   },	// 1
+    { RESET, RESET, SET,   RESET, RESET, SET,   RESET },	// 2
+    { RESET, RESET, RESET, RESET, SET,   SET,   RESET },	// 3
+    { SET,   RESET, RESET, SET,   SET,   RESET, RESET },	// 4
+    { RESET, SET,   RESET, RESET, SET,   RESET, RESET },	// 5
+    { RESET, SET,   RESET, RESET, RESET, RESET, RESET },	// 6
+    { RESET, RESET, RESET, SET,   SET,   SET,   SET   },	// 7
+    { RESET, RESET, RESET, RESET, RESET, RESET, RESET },	// 8
+    { RESET, RESET, RESET, RESET, SET,   RESET, RESET },	// 9
+};
+
+void display7SEG(int num)
+{
+    for (int i = 0; i < 7; i++)
+    {
+        HAL_GPIO_WritePin(segments[i].port, segments[i].pin, digitPatterns[num][i]);
+    }
+}
+
+int counter = 0;
+
+/* USER CODE END 2 */
+
+/* Infinite loop */
+/* USER CODE BEGIN WHILE */
+while (1)
+{
+    if(counter >= 10) counter = 0;
+    display7SEG(counter++);
+    HAL_Delay(1000);
+}
+/* USER CODE END WHILE */

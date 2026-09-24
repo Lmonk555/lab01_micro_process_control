@@ -1,0 +1,91 @@
+MX_GPIO_Init();
+/* USER CODE BEGIN 2 */
+
+typedef struct
+{
+    GPIO_TypeDef *port;
+    uint16_t pin;
+} LedPin;
+
+LedPin clock[] =
+{
+    { LED_0_GPIO_Port, LED_0_Pin },
+    { LED_1_GPIO_Port, LED_1_Pin },
+    { LED_2_GPIO_Port, LED_2_Pin },
+    { LED_3_GPIO_Port, LED_3_Pin },
+    { LED_4_GPIO_Port, LED_4_Pin },
+    { LED_5_GPIO_Port, LED_5_Pin },
+    { LED_6_GPIO_Port, LED_6_Pin },
+    { LED_7_GPIO_Port, LED_7_Pin },
+    { LED_8_GPIO_Port, LED_8_Pin },
+    { LED_9_GPIO_Port, LED_9_Pin },
+    { LED_10_GPIO_Port, LED_10_Pin },
+    { LED_11_GPIO_Port, LED_11_Pin },
+};
+
+void clearAllClock()
+{
+    for (int i = 0; i < 12; i++)
+        HAL_GPIO_WritePin(clock[i].port, clock[i].pin, GPIO_PIN_SET);
+}
+
+void setNumberOnClock(int num)
+{
+    HAL_GPIO_WritePin(clock[num].port, clock[num].pin, GPIO_PIN_RESET);
+}
+
+void clearNumberOnClock(int num)
+{
+    HAL_GPIO_WritePin(clock[num].port, clock[num].pin, GPIO_PIN_SET);
+}
+
+int hour   = 6;
+int minute = 49;
+int second = 50;
+
+int prevHourPin	= hour % 12;
+int prevMinPin	= minute / 5;
+int prevSecPin	= second / 5;
+
+clearAllClock();
+
+/* USER CODE END 2 */
+
+/* Infinite loop */
+/* USER CODE BEGIN WHILE */
+while (1)
+{
+int hourPin = hour % 12;        // 0-11 directly
+int minPin  = minute / 5;       // 0-59 -> 0-11 (each LED = 5 min)
+int secPin  = second / 5;       // 0-59 -> 0-11 (each LED = 5 sec)
+
+// Turn off previous clock pin (if different between [now] & [prev])
+if (second == 0 || prevHourPin != hourPin) clearNumberOnClock(prevHourPin);
+if (second == 0 || prevMinPin  != minPin)  clearNumberOnClock(prevMinPin);
+clearNumberOnClock(prevSecPin);
+
+// Change clock pin to current time
+setNumberOnClock(hourPin);
+setNumberOnClock(minPin);
+setNumberOnClock(secPin);
+
+prevHourPin = hourPin;
+prevMinPin  = minPin;
+prevSecPin  = secPin;
+
+HAL_Delay(1000);
+
+// Second increment
+second++;
+if (second >= 60)
+{
+    second = 0;
+    minute++;
+    if (minute >= 60)
+    {
+        minute = 0;
+        hour++;
+        if (hour >= 12) hour = 0;
+    }
+}
+}

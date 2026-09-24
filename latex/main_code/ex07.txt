@@ -1,0 +1,64 @@
+MX_GPIO_Init();
+/* USER CODE BEGIN 2 */
+
+typedef struct
+{
+    GPIO_TypeDef *port;
+    uint16_t pin;
+} LedPin;
+
+LedPin clock[] =
+{
+    { LED_0_GPIO_Port, LED_0_Pin },
+    { LED_1_GPIO_Port, LED_1_Pin },
+    { LED_2_GPIO_Port, LED_2_Pin },
+    { LED_3_GPIO_Port, LED_3_Pin },
+    { LED_4_GPIO_Port, LED_4_Pin },
+    { LED_5_GPIO_Port, LED_5_Pin },
+    { LED_6_GPIO_Port, LED_6_Pin },
+    { LED_7_GPIO_Port, LED_7_Pin },
+    { LED_8_GPIO_Port, LED_8_Pin },
+    { LED_9_GPIO_Port, LED_9_Pin },
+    { LED_10_GPIO_Port, LED_10_Pin },
+    { LED_11_GPIO_Port, LED_11_Pin },
+};
+
+GPIO_PinState state[12][12] =
+{
+    {RESET, SET, SET, SET, SET, SET, SET, SET, SET, SET, SET, SET},	// 0 & 12
+    {SET, RESET, SET, SET, SET, SET, SET, SET, SET, SET, SET, SET},	// 1
+    {SET, SET, RESET, SET, SET, SET, SET, SET, SET, SET, SET, SET}, // 2
+    {SET, SET, SET, RESET, SET, SET, SET, SET, SET, SET, SET, SET},	// 3
+    {SET, SET, SET, SET, RESET, SET, SET, SET, SET, SET, SET, SET},	// 4
+    {SET, SET, SET, SET, SET, RESET, SET, SET, SET, SET, SET, SET},	// 5
+    {SET, SET, SET, SET, SET, SET, RESET, SET, SET, SET, SET, SET},	// 6
+    {SET, SET, SET, SET, SET, SET, SET, RESET, SET, SET, SET, SET},	// 7
+    {SET, SET, SET, SET, SET, SET, SET, SET, RESET, SET, SET, SET},	// 8
+    {SET, SET, SET, SET, SET, SET, SET, SET, SET, RESET, SET, SET},	// 9
+    {SET, SET, SET, SET, SET, SET, SET, SET, SET, SET, RESET, SET},	// 10
+    {SET, SET, SET, SET, SET, SET, SET, SET, SET, SET, SET, RESET},	// 11
+};
+
+void clearAllClock()
+{
+    for (int i = 0; i < 12; i++)
+        HAL_GPIO_WritePin(clock[i].port, clock[i].pin, SET);
+}
+
+
+/* USER CODE END 2 */
+
+/* Infinite loop */
+/* USER CODE BEGIN WHILE */
+while (1)
+{
+for (int i = 0; i < 12; i++)
+{
+    for (int j = 0; j < 12; j++)
+        HAL_GPIO_WritePin(clock[j].port, clock[j].pin, state[i][j]);
+
+    HAL_Delay(1000);
+    clearAllClock();
+    HAL_Delay(1000);
+}
+}
